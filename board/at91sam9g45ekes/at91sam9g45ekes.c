@@ -132,7 +132,7 @@ static	SDdramConfig ddram_config = {
 			AT91C_DDRC2_TWR_2   |		//  2 * 7.5 = 15   ns
 			AT91C_DDRC2_TRC_8  |		//  8 * 7.5 = 75   ns
 			AT91C_DDRC2_TRP_2   |		//  2 * 7.5 = 22.5 ns
-			AT91C_DDRC2_TRRD_1  |		//  1 * 7.5 = 7.5   ns
+			AT91C_DDRC2_TRRD_3  |		//  1 * 7.5 = 7.5   ns
 			AT91C_DDRC2_TWTR_1  |		//  1 clock cycle
 			AT91C_DDRC2_TMRD_2),		//  2 clock cycles
 
