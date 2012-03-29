@@ -66,7 +66,7 @@ static inline void set_cp15(unsigned int value)
 void hw_init(void)
 {
 	unsigned int cp15;
-	
+
 	/* Configure PIOs */
 	const struct pio_desc hw_pio[] = {
 #ifdef CFG_DEBUG
@@ -128,7 +128,7 @@ void hw_init(void)
 				AT91C_SDRAMC_TRAS_5 |
 				AT91C_SDRAMC_TXSR_8,		/* Control Register */
 				(MASTER_CLOCK * 7)/1000000,	/* Refresh Timer Register */
-				AT91C_SDRAMC_MD_SDRAM);		/* SDRAM (no low power)   */ 
+				AT91C_SDRAMC_MD_SDRAM);		/* SDRAM (no low power)   */
 
 
 #endif /* CFG_SDRAM */
@@ -191,7 +191,7 @@ void df_recovery(AT91PS_DF pDf)
 	/* Configure the PIO controller */
 	writel((1 << AT91C_ID_PIOA), PMC_PCER + AT91C_BASE_PMC);
 	pio_setup(bp4_pio);
-	
+
 	/* If BP4 is pressed during Boot sequence */
 	/* Erase NandFlash block 0*/
 	if ( !pio_get_value(AT91C_PIN_PA(31)) )
@@ -205,6 +205,7 @@ void df_recovery(AT91PS_DF pDf)
 /*------------------------------------------------------------------------------*/
 void df_hw_init(void)
 {
+	#error fix the pins definition
 	/* Configure PIOs */
 	const struct pio_desc df_pio[] = {
 		{"MISO",  AT91C_PIN_PA(0), 0, PIO_DEFAULT, PIO_PERIPH_A},
@@ -236,14 +237,14 @@ static void nand_recovery(void)
 {
 	/* Configure PIOs */
 	const struct pio_desc bp4_pio[] = {
-		{"BP4", AT91C_PIN_PA(31), 0, PIO_PULLUP, PIO_INPUT},
-		{(char *) 0, 0, 0, PIO_DEFAULT, PIO_PERIPH_A},
+		{AT91C_PIN_PA(31), 0, PIO_PULLUP, PIO_INPUT},
+		{255, 0, 0, PIO_DEFAULT, PIO_PERIPH_A},
 	};
 
 	/* Configure the PIO controller */
 	writel((1 << AT91C_ID_PIOA), PMC_PCER + AT91C_BASE_PMC);
 	pio_setup(bp4_pio);
-	
+
 	/* If BP4 is pressed during Boot sequence */
 	/* Erase NandFlash block 0*/
 	if (!pio_get_value(AT91C_PIN_PA(31)) )
@@ -258,25 +259,25 @@ void nandflash_hw_init(void)
 {
 	/* Configure PIOs */
 	const struct pio_desc nand_pio[] = {
-		{"RDY_BSY", AT91C_PIN_PC(13), 0, PIO_PULLUP, PIO_INPUT},
-		{"NANDCS",  AT91C_PIN_PC(14), 0, PIO_PULLUP, PIO_OUTPUT},
-		{(char *) 0, 0, 0,  PIO_DEFAULT, PIO_PERIPH_A},
+		{AT91C_PIN_PC(13), 0, PIO_PULLUP, PIO_INPUT},
+		{AT91C_PIN_PC(14), 0, PIO_PULLUP, PIO_OUTPUT},
+		{255, 0,  PIO_DEFAULT, PIO_PERIPH_A},
 	};
 
 	/* Setup Smart Media, first enable the address range of CS3 in HMATRIX user interface */
 	writel(readl(AT91C_BASE_CCFG + CCFG_EBICSA) | AT91C_EBI_CS3A_SM, AT91C_BASE_CCFG + CCFG_EBICSA);
-		    
+
 	/* Configure SMC CS3 */
  	writel((AT91C_SM_NWE_SETUP | AT91C_SM_NCS_WR_SETUP | AT91C_SM_NRD_SETUP | AT91C_SM_NCS_RD_SETUP), AT91C_BASE_SMC + SMC_SETUP3);
   	writel((AT91C_SM_NWE_PULSE | AT91C_SM_NCS_WR_PULSE | AT91C_SM_NRD_PULSE | AT91C_SM_NCS_RD_PULSE), AT91C_BASE_SMC + SMC_PULSE3);
 	writel((AT91C_SM_NWE_CYCLE | AT91C_SM_NRD_CYCLE)						, AT91C_BASE_SMC + SMC_CYCLE3);
-	writel((AT91C_SMC_READMODE | AT91C_SMC_WRITEMODE | AT91C_SMC_NWAITM_NWAIT_DISABLE | 
+	writel((AT91C_SMC_READMODE | AT91C_SMC_WRITEMODE | AT91C_SMC_NWAITM_NWAIT_DISABLE |
   		AT91C_SMC_DBW_WIDTH_SIXTEEN_BITS | AT91C_SM_TDF)						, AT91C_BASE_SMC + SMC_CTRL3);
 
 	/* Configure the PIO controller */
 	writel((1 << AT91C_ID_PIOC), PMC_PCER + AT91C_BASE_PMC);
 	pio_setup(nand_pio);
-	
+
 	nand_recovery();
 }
 

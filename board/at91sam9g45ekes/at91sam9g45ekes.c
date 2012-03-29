@@ -43,6 +43,9 @@
 #include "../../include/dataflash.h"
 #endif
 
+#define 	AT91C_DDRC2_DIC_DS_NORMAL               (0x0 <<  8) // (HDDRSDRC2) Normal driver strength.
+#define 	AT91C_DDRC2_DIC_DS_WEEK                 (0x1 <<  8) // (HDDRSDRC2) Weak driver strength
+
 static inline unsigned int get_cp15(void)
 {
 	unsigned int value;
@@ -116,6 +119,41 @@ void hw_init(void)
 }
 #endif /* CFG_HW_INIT */
 
+#ifdef CFG_SDRAM_EBI_CS1
+
+static	SDdramConfig sdram_ebi_cs1_config = {
+	.ddramc_mdr  = (AT91C_DDRC2_DBW_16_BITS | AT91C_DDRC2_MD_SDR_SDRAM),
+
+	.ddramc_cr   = (AT91C_DDRC2_NC_DDR10_SDR9  |     	// 10 column bits (1K)
+			AT91C_DDRC2_NR_13          |     	// 14 row bits    (8K)
+			AT91C_DDRC2_CAS_2          |     	// CAS Latency 3
+			AT91C_DDRC2_DLL_RESET_ENABLED
+		),	// DLL not reset
+
+	.ddramc_rtr  = 	(BOARD_MCK * 7) / 1000000,
+
+	.ddramc_t0pr = (AT91C_DDRC2_TRAS_5  |		//  6 * 7.5 = 45   ns
+			AT91C_DDRC2_TRCD_2  |		//  2 * 7.5 = 22.5 ns
+			AT91C_DDRC2_TWR_2   |		//  2 * 7.5 = 15   ns
+			AT91C_DDRC2_TRC_7  |		//  8 * 7.5 = 75   ns
+			AT91C_DDRC2_TRP_2   |		//  2 * 7.5 = 22.5 ns
+			AT91C_DDRC2_TRRD_1  |		//  1 * 7.5 = 7.5   ns
+			AT91C_DDRC2_TWTR_1  |		//  1 clock cycle
+			AT91C_DDRC2_TMRD_2),		//  2 clock cycles
+
+	.ddramc_t1pr = (AT91C_DDRC2_TXP_2  |		//  2 * 7.5 = 15 ns
+			200 << 16           |		// 200 clock cycles, TXSRD: Exit self refresh delay to Read command
+			16 << 8             |		// 16 * 7.5 = 120 ns TXSNR: Exit self refresh delay to non read command
+			AT91C_DDRC2_TRFC_14 << 0),	// 14 * 7.5 = 142 ns (must be 140 ns for 1Gb DDR)
+
+	.ddramc_t2pr = (AT91C_DDRC2_TRTP_1   |		//  1 * 7.5 = 7.5 ns
+			AT91C_DDRC2_TRPA_0   |		//  0 * 7.5 = 0 ns
+			AT91C_DDRC2_TXARDS_7 |		//  7 clock cycles
+			AT91C_DDRC2_TXARD_2),		//  2 clock cycles
+};
+
+#endif /* CFG_SDRAM_EBI_CS1 */
+
 #ifdef CFG_DDRAM
 static	SDdramConfig ddram_config = {
 	.ddramc_mdr  = (AT91C_DDRC2_DBW_16_BITS | AT91C_DDRC2_MD_DDR2_SDRAM),
@@ -123,7 +161,9 @@ static	SDdramConfig ddram_config = {
 	.ddramc_cr   = (AT91C_DDRC2_NC_DDR10_SDR9  |     	// 10 column bits (1K)
 			AT91C_DDRC2_NR_14          |     	// 14 row bits    (8K)
 			AT91C_DDRC2_CAS_3          |     	// CAS Latency 3
-			AT91C_DDRC2_DLL_RESET_DISABLED),	// DLL not reset
+			AT91C_DDRC2_DIC_DS_WEEK    | // low output driver impendance
+			AT91C_DDRC2_DLL_RESET_ENABLED
+		),	// DLL not reset
 
 	.ddramc_rtr  = 	0x24B,
 
@@ -162,14 +202,16 @@ void ddramc_hw_init(void)
 	/* Setup Smart Media, first enable the address range of CS3 in HMATRIX user interface */
 	writel(readl(AT91C_BASE_CCFG + CCFG_EBICSA) | AT91C_EBI_CS1A_SDRAMC, AT91C_BASE_CCFG + CCFG_EBICSA);
 
-	/* EBI IO in 1.8V mode */
-	writel(readl(AT91C_BASE_CCFG + CCFG_EBICSA) & ~(1<<16), AT91C_BASE_CCFG + CCFG_EBICSA);
+	/* EBI IO in 3.3V mode */
+	writel(readl(AT91C_BASE_CCFG + CCFG_EBICSA) | ((1 << 16) & ~(1 << 17)), AT91C_BASE_CCFG + CCFG_EBICSA);
 
-	/* EBI DDRAM controller */
-	ddram_init(AT91C_BASE_DDR2CP1, AT91C_EBI_CS1, &ddram_config);
-
+#ifdef CFG_SDRAM_EBI_CS1
+	/* EBI DDRAM controller, no specific configuration is required */
+	sdram_ebi_cs1_init(AT91C_BASE_DDR2CP1, AT91C_EBI_CS1, &sdram_ebi_cs1_config);
+#endif
 }
 #endif /* CFG_DDRAM */
+
 
 #ifdef CFG_DATAFLASH
 

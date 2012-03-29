@@ -50,40 +50,81 @@ static unsigned int read_ddramc(unsigned int address, unsigned int offset)
 }
 
 //*----------------------------------------------------------------------------
-//* \fn    sdram_init
+//* \fn    ddram_init
 //* \brief Initialize the SDDRC Controller
 //*----------------------------------------------------------------------------
 int ddram_init(unsigned int ddram_controller_address, unsigned int ddram_address, struct SDdramConfig *ddram_config)
 {
 	volatile unsigned int i;
 	unsigned int cr = 0;
-	
+
 	// Step 1: Program the memory device type
 	// Configure the DDR controller
 	write_ddramc(ddram_controller_address, HDDRSDRC2_MDR, ddram_config->ddramc_mdr);
 
 	// Program the DDR Controller
-	write_ddramc(ddram_controller_address, HDDRSDRC2_CR, ddram_config->ddramc_cr); 
+	write_ddramc(ddram_controller_address, HDDRSDRC2_CR, ddram_config->ddramc_cr);
+
+	/**
+	 * delay's experiment.
+	 */
+	write_ddramc(ddram_controller_address, HDDRSDRC2_DELAY1, // delay for LSB data
+		     /* delay for data line 0 */ (0 << 0) |
+		     /* delay for data line 1 */ (0 << 4) |
+		     /* delay for data line 2 */ (0 << 8) |
+		     /* delay for data line 3 */ (0 << 12) |
+		     /* delay for data line 4 */ (0 << 16) |
+		     /* delay for data line 5 */ (0 << 20) |
+		     /* delay for data line 6 */ (0 << 24) |
+		     /* delay for data line 7 */ (0 << 28));
+	write_ddramc(ddram_controller_address, HDDRSDRC2_DELAY2, // delay for MSB data
+		     /* delay for data line 8 */ (2 << 0) |
+		     /* delay for data line 9 */ (2 << 4) |
+		     /* delay for data line 10 */ (2 << 8) |
+		     /* delay for data line 11 */ (2 << 12) |
+		     /* delay for data line 12 */ (2 << 16) |
+		     /* delay for data line 13 */ (2 << 20) |
+		     /* delay for data line 14 */ (2 << 24) |
+		     /* delay for data line 15 */ (2 << 28));
+	write_ddramc(ddram_controller_address, HDDRSDRC2_DELAY3, // delay for LSB address
+		     /* delay for address line 0 */ (0 << 0) |
+		     /* delay for address line 1 */ (0 << 4) |
+		     /* delay for address line 2 */ (0 << 8) |
+		     /* delay for address line 3 */ (0 << 12) |
+		     /* delay for address line 4 */ (0 << 16) |
+		     /* delay for address line 5 */ (0 << 20) |
+		     /* delay for address line 6 */ (0 << 24) |
+		     /* delay for address line 7 */ (0 << 28));
+	write_ddramc(ddram_controller_address, HDDRSDRC2_DELAY4, // delay for MSB address
+		     /* delay for address line 8 */ (0 << 0) |
+		     /* delay for address line 9 */ (0 << 4) |
+		     /* delay for address line 10 */ (0 << 8) |
+		     /* delay for address line 11 */ (0 << 12) |
+		     /* delay for address line 12 */ (0 << 16) |
+		     /* delay for address line 13 */ (0 << 20) |
+		     /* delay for nothing */ (0 << 24) |
+		     /* delay for nothing */ (0 << 28));
+
 
 	// assume timings for 7.5ns min clock period
 	write_ddramc(ddram_controller_address, HDDRSDRC2_T0PR, ddram_config->ddramc_t0pr);
 
-	// pSDDRC->HDDRSDRC2_T1PR 
+	// pSDDRC->HDDRSDRC2_T1PR
 	write_ddramc(ddram_controller_address, HDDRSDRC2_T1PR, ddram_config->ddramc_t1pr);
 
-	// pSDDRC->HDDRSDRC2_T2PR 
+	// pSDDRC->HDDRSDRC2_T2PR
 	write_ddramc(ddram_controller_address, HDDRSDRC2_T2PR, ddram_config->ddramc_t2pr);
 
 	// Initialization Step 3: NOP command -> allow to enable clk
 	write_ddramc(ddram_controller_address, HDDRSDRC2_MR, AT91C_DDRC2_MODE_NOP_CMD);
 	*((unsigned volatile int*) ddram_address) = 0;
- 
+
 	// Initialization Step 3 (must wait 200 us) (6 core cycles per iteration, core is at 396MHz: min 13200 loops)
 	for (i = 0; i < 13300; i++) {
 		asm("    nop");
 	}
-	
-	// Step 4:  An NOP command is issued to the DDR2-SDRAM 
+
+	// Step 4:  An NOP command is issued to the DDR2-SDRAM
 	// NOP command -> allow to enable cke
 	write_ddramc(ddram_controller_address, HDDRSDRC2_MR, AT91C_DDRC2_MODE_NOP_CMD);
 	*((unsigned volatile int*) ddram_address) = 0;
@@ -220,8 +261,127 @@ int ddram_init(unsigned int ddram_controller_address, unsigned int ddram_address
 	for (i = 0; i < 500; i++) {
 		asm("    nop");
 	}
-	
+
 	return 0;
 }
 
 #endif /* CFG_DDRAM */
+
+#ifdef CFG_SDRAM_EBI_CS1
+int sdram_ebi_cs1_init(unsigned int ddram_controller_address, unsigned int ddram_address, struct SDdramConfig *ddram_config)
+{
+	volatile unsigned int i;
+	unsigned int *pDdr = (unsigned int *) ddram_address;
+
+	// Step 1: Program the memory device type
+	// Configure the DDR controller
+	write_ddramc(ddram_controller_address, HDDRSDRC2_MDR, ddram_config->ddramc_mdr);
+
+	// Program the DDR Controller
+	write_ddramc(ddram_controller_address, HDDRSDRC2_CR, ddram_config->ddramc_cr);
+
+	// assume timings for 7.5ns min clock period
+	write_ddramc(ddram_controller_address, HDDRSDRC2_T0PR, ddram_config->ddramc_t0pr);
+
+	// pSDDRC->HDDRSDRC2_T1PR
+	write_ddramc(ddram_controller_address, HDDRSDRC2_T1PR, ddram_config->ddramc_t1pr);
+
+	// pSDDRC->HDDRSDRC2_T2PR
+	write_ddramc(ddram_controller_address, HDDRSDRC2_T2PR, ddram_config->ddramc_t2pr);
+
+	// Initialization Step 3: NOP command -> allow to enable clk
+//	write_ddramc(ddram_controller_address, HDDRSDRC2_MR, AT91C_DDRC2_MODE_NOP_CMD);
+//	*((unsigned volatile int*) ddram_address) = 0;
+
+	// Initialization Step 3 (must wait 200 us) (6 core cycles per iteration, core is at 396MHz: min 13200 loops)
+	for (i = 0; i < 13300; i++) {
+		asm("    nop");
+	}
+
+	// Step 4:  An NOP command is issued to the DDR2-SDRAM
+	// NOP command -> allow to enable cke
+	write_ddramc(ddram_controller_address, HDDRSDRC2_MR, AT91C_DDRC2_MODE_NOP_CMD);
+	*((unsigned volatile int*) ddram_address) = 0;
+
+	// wait 400 ns min
+	for (i = 0; i < 100; i++) {
+		asm("    nop");
+	}
+
+	// Initialization Step 5: Set All Bank Precharge
+	write_ddramc(ddram_controller_address, HDDRSDRC2_MR, AT91C_DDRC2_MODE_PRCGALL_CMD);
+	*((unsigned volatile int*) ddram_address) = 0;
+
+	// wait 400 ns min
+	for (i = 0; i < 100; i++) {
+		asm("    nop");
+	}
+
+	// refresh 0
+	pDdr++;
+	write_ddramc(ddram_controller_address, HDDRSDRC2_MR, AT91C_DDRC2_MODE_RFSH_CMD);
+	*pDdr = 1;
+
+	// refresh 1
+	pDdr++;
+	write_ddramc(ddram_controller_address, HDDRSDRC2_MR, AT91C_DDRC2_MODE_RFSH_CMD);
+	*pDdr = 2;
+
+	// refresh 2
+	pDdr++;
+	write_ddramc(ddram_controller_address, HDDRSDRC2_MR, AT91C_DDRC2_MODE_RFSH_CMD);
+	*pDdr = 3;
+
+	// refresh 3
+	pDdr++;
+	write_ddramc(ddram_controller_address, HDDRSDRC2_MR, AT91C_DDRC2_MODE_RFSH_CMD);
+	*pDdr = 4;
+
+	// refresh 4
+	pDdr++;
+	write_ddramc(ddram_controller_address, HDDRSDRC2_MR, AT91C_DDRC2_MODE_RFSH_CMD);
+	*pDdr = 5;
+
+	// refresh 5
+	pDdr++;
+	write_ddramc(ddram_controller_address, HDDRSDRC2_MR, AT91C_DDRC2_MODE_RFSH_CMD);
+	*pDdr = 6;
+
+	// refresh 6
+	pDdr++;
+	write_ddramc(ddram_controller_address, HDDRSDRC2_MR, AT91C_DDRC2_MODE_RFSH_CMD);
+	*pDdr = 7;
+
+	// refresh 7
+	pDdr++;
+	write_ddramc(ddram_controller_address, HDDRSDRC2_MR, AT91C_DDRC2_MODE_RFSH_CMD);
+	*pDdr = 8;
+
+	pDdr++;
+
+	write_ddramc(ddram_controller_address, HDDRSDRC2_MR, AT91C_DDRC2_MODE_LMR_CMD);
+	*((unsigned int *)(pDdr + 0x2000000)) = 0xcafedede;
+
+	// Step 21: Write the refresh rate into the count field in the Refresh Timer register. The DDR2-SDRAM device requires a
+	// refresh every 15.625 ¦Is or 7.81 ¦Ìs. With a 100MHz frequency, the refresh timer count register must to be set with
+	// (15.625 /100 MHz) = 1562 i.e. 0x061A or (7.81 /100MHz) = 781 i.e. 0x030d.
+
+	// Set Refresh timer
+	write_ddramc(ddram_controller_address, HDDRSDRC2_RTR, ddram_config->ddramc_rtr);
+
+	// OK now we are ready to work on the DDRSDR
+
+	// Step 19,20: A mode Normal command is provided. Program the Normal mode into Mode Register.
+	write_ddramc(ddram_controller_address, HDDRSDRC2_MR, AT91C_DDRC2_MODE_NORMAL_CMD);
+	*(((unsigned volatile int*) ddram_address)) = 0;
+
+
+	// wait for end of calibration
+	for (i = 0; i < 500; i++) {
+		asm("    nop");
+	}
+
+	return 0;
+}
+
+#endif /* CFG_SDRAM_EBI_CS1 */

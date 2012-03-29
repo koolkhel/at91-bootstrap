@@ -45,12 +45,19 @@
 
 #define BOARD_MAINOSC           12000000
 #define BOARD_MCK               ((unsigned long)((BOARD_MAINOSC / 3 / 2 / 3) * 200 )) // 133MHz
+//#define BOARD_MCK               ((unsigned long)((BOARD_MAINOSC / 3 / 2 / 4) * 200 )) // 100MHz
+
+//#define BOARD_MCK               ((unsigned long)((BOARD_MAINOSC / 3 / 2 / 4) * 150 )) // 75MHz
+
+
 #define BOARD_OSCOUNT           (AT91C_CKGR_OSCOUNT & (64 << 8))
 #define BOARD_CKGR_PLLA         (AT91C_CKGR_SRCA | AT91C_CKGR_OUTA_0)
 #define BOARD_PLLACOUNT         (0x3F << 8)
 #define BOARD_MULA              (AT91C_CKGR_MULA & (199 << 16))
 #define BOARD_DIVA              (AT91C_CKGR_DIVA & 3)
-#define BOARD_PRESCALER         (0x00001300)
+
+#define BOARD_PRESCALER         (0x00001300) // 400/133 MHz
+//#define BOARD_PRESCALER         (0x00001200) //400/100MHz
 
 #define PLLA_SETTINGS           ( BOARD_CKGR_PLLA \
                                 | BOARD_PLLACOUNT \
@@ -120,6 +127,7 @@
 #undef	NANDFLASH_SMALL_BLOCKS	/* NANDFLASH_LARGE_BLOCKS used instead */
 
 #define	CFG_DDRAM
+#define CFG_SDRAM_EBI_CS1
 #define	CFG_HW_INIT
 #define	CFG_DEBUG
 #define	DEBUG
