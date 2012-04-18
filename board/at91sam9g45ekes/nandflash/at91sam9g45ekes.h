@@ -120,7 +120,7 @@
 /* ******************************************************************* */
 /* Application Settings                                                */
 /* ******************************************************************* */
-#undef CFG_DEBUG
+#define CFG_DEBUG
 #undef CFG_DATAFLASH
 
 #define CFG_NANDFLASH

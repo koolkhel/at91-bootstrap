@@ -79,6 +79,9 @@ int main(void)
 	linux_arg(LINUX_ARG);	/* NOT IMPLEMENTED YET */
 #endif /* LINUX_ARG */
 
+#ifdef CFG_DEBUG
+	dbg_print("starting u-boot\r\n");
+#endif
 	/* Jump to the Image Address */
 	return JUMP_ADDR;
 }

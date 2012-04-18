@@ -159,27 +159,28 @@ static	SDdramConfig ddram_config = {
 	.ddramc_mdr  = (AT91C_DDRC2_DBW_16_BITS | AT91C_DDRC2_MD_DDR2_SDRAM),
 
 	.ddramc_cr   = (AT91C_DDRC2_NC_DDR10_SDR9  |     	// 10 column bits (1K)
-			AT91C_DDRC2_NR_14          |     	// 14 row bits    (8K)
+			AT91C_DDRC2_NR_13          |     	// 13 row bits    (8K)
 			AT91C_DDRC2_CAS_3          |     	// CAS Latency 3
-			AT91C_DDRC2_DIC_DS_WEEK    | // low output driver impendance
-			AT91C_DDRC2_DLL_RESET_ENABLED
+			AT91C_DDRC2_DLL_RESET_DISABLED
+//			AT91C_DDRC2_DIC_DS_WEEK    | // low output driver impendance
+//			AT91C_DDRC2_DLL_RESET_ENABLED
 		),	// DLL not reset
 
-	.ddramc_rtr  = 	0x24B,
+	.ddramc_rtr  = 	0x411,
 
 	.ddramc_t0pr = (AT91C_DDRC2_TRAS_6  |		//  6 * 7.5 = 45   ns
 			AT91C_DDRC2_TRCD_2  |		//  2 * 7.5 = 22.5 ns
 			AT91C_DDRC2_TWR_2   |		//  2 * 7.5 = 15   ns
 			AT91C_DDRC2_TRC_8  |		//  8 * 7.5 = 75   ns
 			AT91C_DDRC2_TRP_2   |		//  2 * 7.5 = 22.5 ns
-			AT91C_DDRC2_TRRD_3  |		//  1 * 7.5 = 7.5   ns
+			AT91C_DDRC2_TRRD_2  |		//  1 * 7.5 = 7.5   ns
 			AT91C_DDRC2_TWTR_1  |		//  1 clock cycle
 			AT91C_DDRC2_TMRD_2),		//  2 clock cycles
 
 	.ddramc_t1pr = (AT91C_DDRC2_TXP_2  |		//  2 * 7.5 = 15 ns
 			200 << 16           |		// 200 clock cycles, TXSRD: Exit self refresh delay to Read command
 			16 << 8             |		// 16 * 7.5 = 120 ns TXSNR: Exit self refresh delay to non read command
-			AT91C_DDRC2_TRFC_14 << 0),	// 14 * 7.5 = 142 ns (must be 140 ns for 1Gb DDR)
+			AT91C_DDRC2_TRFC_14 << 0),	// 14 * 7.5 = 105 ns (must be 105 ns for 512Mb DDR)
 
 	.ddramc_t2pr = (AT91C_DDRC2_TRTP_1   |		//  1 * 7.5 = 7.5 ns
 			AT91C_DDRC2_TRPA_0   |		//  0 * 7.5 = 0 ns
