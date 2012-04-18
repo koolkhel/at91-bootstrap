@@ -78,14 +78,14 @@ int ddram_init(unsigned int ddram_controller_address, unsigned int ddram_address
 		     /* delay for data line 6 */ (0 << 24) |
 		     /* delay for data line 7 */ (0 << 28));
 	write_ddramc(ddram_controller_address, HDDRSDRC2_DELAY2, // delay for MSB data
-		     /* delay for data line 8 */ (2 << 0) |
-		     /* delay for data line 9 */ (2 << 4) |
-		     /* delay for data line 10 */ (2 << 8) |
-		     /* delay for data line 11 */ (2 << 12) |
-		     /* delay for data line 12 */ (2 << 16) |
-		     /* delay for data line 13 */ (2 << 20) |
-		     /* delay for data line 14 */ (2 << 24) |
-		     /* delay for data line 15 */ (2 << 28));
+		     /* delay for data line 8 */ (0 << 0) |
+		     /* delay for data line 9 */ (0 << 4) |
+		     /* delay for data line 10 */ (0 << 8) |
+		     /* delay for data line 11 */ (0 << 12) |
+		     /* delay for data line 12 */ (0 << 16) |
+		     /* delay for data line 13 */ (0 << 20) |
+		     /* delay for data line 14 */ (0 << 24) |
+		     /* delay for data line 15 */ (0 << 28));
 	write_ddramc(ddram_controller_address, HDDRSDRC2_DELAY3, // delay for LSB address
 		     /* delay for address line 0 */ (0 << 0) |
 		     /* delay for address line 1 */ (0 << 4) |
