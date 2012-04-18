@@ -132,12 +132,12 @@ static	SDdramConfig sdram_ebi_cs1_config = {
 
 	.ddramc_rtr  = 	(BOARD_MCK * 7) / 1000000,
 
-	.ddramc_t0pr = (AT91C_DDRC2_TRAS_5  |		//  6 * 7.5 = 45   ns
-			AT91C_DDRC2_TRCD_2  |		//  2 * 7.5 = 22.5 ns
+	.ddramc_t0pr = (AT91C_DDRC2_TRAS_6  |		//  6 * 7.5 = 45   ns
+			AT91C_DDRC2_TRCD_3  |		//  2 * 7.5 = 22.5 ns
 			AT91C_DDRC2_TWR_2   |		//  2 * 7.5 = 15   ns
-			AT91C_DDRC2_TRC_7  |		//  8 * 7.5 = 75   ns
-			AT91C_DDRC2_TRP_2   |		//  2 * 7.5 = 22.5 ns
-			AT91C_DDRC2_TRRD_1  |		//  1 * 7.5 = 7.5   ns
+			AT91C_DDRC2_TRC_8  |		//  8 * 7.5 = 75   ns
+			AT91C_DDRC2_TRP_3   |		//  2 * 7.5 = 22.5 ns
+			AT91C_DDRC2_TRRD_2  |		//  1 * 7.5 = 7.5   ns
 			AT91C_DDRC2_TWTR_1  |		//  1 clock cycle
 			AT91C_DDRC2_TMRD_2),		//  2 clock cycles
 
