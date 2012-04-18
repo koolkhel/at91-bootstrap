@@ -145,7 +145,7 @@ int ddram_init(unsigned int ddram_controller_address, unsigned int ddram_address
 
        // Initialization Step 6: Set EMR operation (EMRS2)
 	write_ddramc(ddram_controller_address, HDDRSDRC2_MR, AT91C_DDRC2_MODE_EXT_LMR_CMD);
-	*((unsigned int *)(ddram_address + 0x4000000)) = 0;
+	*((unsigned int *)(ddram_address + 0x2000000)) = 0; // BA[1] is set to 1 and BA[0] are set to 0.
 
 	// wait 2 cycles min
 	for (i = 0; i < 100; i++) {
@@ -154,7 +154,7 @@ int ddram_init(unsigned int ddram_controller_address, unsigned int ddram_address
 
 	// Initialization Step 7: Set EMR operation (EMRS3)
 	write_ddramc(ddram_controller_address, HDDRSDRC2_MR, AT91C_DDRC2_MODE_EXT_LMR_CMD);
-	*((unsigned int *)(ddram_address + 0x6000000)) = 0;
+	*((unsigned int *)(ddram_address + 0x3000000)) = 0; //BA[1] is set to 1 and BA[0] are set to 1.
 
 	// wait 2 cycles min
 	for (i = 0; i < 100; i++) {
@@ -163,7 +163,7 @@ int ddram_init(unsigned int ddram_controller_address, unsigned int ddram_address
 
 	// Initialization Step 8: Set EMR operation (EMRS1)
 	write_ddramc(ddram_controller_address, HDDRSDRC2_MR, AT91C_DDRC2_MODE_EXT_LMR_CMD);
-	*((unsigned int *)(ddram_address + 0x2000000)) = 0;
+	*((unsigned int *)(ddram_address)) = 0; //BA[1] and BA[0] are set to 0.
 
 	// wait 200 cycles min
 	for (i = 0; i < 10000; i++) {
@@ -224,7 +224,7 @@ int ddram_init(unsigned int ddram_controller_address, unsigned int ddram_address
 
 	// Step 16: An Extended Mode Register set (EMRS1) cycle is issued to OCD default value.
 	write_ddramc(ddram_controller_address, HDDRSDRC2_MR, AT91C_DDRC2_MODE_EXT_LMR_CMD);
-	*(((unsigned int*) (ddram_address + 0x2000000))) = 0;
+	*(((unsigned int*) (ddram_address + 0x1000000))) = 0; //BA[1] is set to 0 and BA[0] is set to 1
 
 	// wait 2 cycles min
 	for (i = 0; i < 100; i++) {
@@ -237,7 +237,7 @@ int ddram_init(unsigned int ddram_controller_address, unsigned int ddram_address
 
 	// Step 18: An Extended Mode Register set (EMRS1) cycle is issued to enable OCD exit.
 	write_ddramc(ddram_controller_address, HDDRSDRC2_MR, AT91C_DDRC2_MODE_EXT_LMR_CMD);
-	*(((unsigned int*) (ddram_address + 0x6000000))) = 0;
+	*(((unsigned int*) (ddram_address + 0x3000000))) = 0; //BA[1] is set to 1and BA[0] is set to 1.
 
 	// wait 2 cycles min
 	for (i = 0; i < 100; i++) {

@@ -166,7 +166,7 @@ static	SDdramConfig ddram_config = {
 //			AT91C_DDRC2_DLL_RESET_ENABLED
 		),	// DLL not reset
 
-	.ddramc_rtr  = 	0x411,
+	.ddramc_rtr  = 	0x208,
 
 	.ddramc_t0pr = (AT91C_DDRC2_TRAS_6  |		//  6 * 7.5 = 45   ns
 			AT91C_DDRC2_TRCD_2  |		//  2 * 7.5 = 22.5 ns
